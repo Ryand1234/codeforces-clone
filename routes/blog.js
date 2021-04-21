@@ -3,15 +3,17 @@ const userAuthorize = require('../util/middleware')
 const { error, result } = require('../util/interface')
 var mySqlConnection = require('../util/db')
 var mysql = mySqlConnection()
+const makeNotification = require('../controllers/notification')
 
 // create blog
 router.post('/create', userAuthorize, async (_req, res) => {
   try {
     const CREATE_BLOG = `INSERT INTO blogs (title, description, userId) VALUES ('${req.body.title}', '${req.body.description}', '${req.user.userId}')`// create blog query
-    mysql.query(CREATE_BLOG, (err) => {
+    mysql.query(CREATE_BLOG, async(err) => {
       if(err) {
         res.status(501).json(error)
       }
+      await makeNotification('blog', req.user.email)
       res.status(200).json(result)
     })
   } catch (err) {

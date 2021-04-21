@@ -3,13 +3,25 @@ const express = require('express')
 // var logger = require('morgan')
 var bodyParser = require('body-parser')
 require('dotenv').config()
+var logger = require('./util/logger')
+var httpLogger = require('./util/httplogger')
 
 const app = express()
 // app.use(logger('dev'));
 app.use(express.static(__dirname + '/dist'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(logErrors)
+app.use(errorHandler)
+app.use(httpLogger)
+// logging functions
+function logErrors (err, req, res, next) {
+  console.error(err.stack)
+  next(err)
+}
+function errorHandler (err, req, res, next) {
+  res.status(500).send('Error!')
+}
 // Database Connection
 const mySqlConnection = require('./util/db')
 const myConnection = mySqlConnection()
@@ -47,6 +59,10 @@ const submissionRoutes = require('./routes/submission')
 
 app.use('/api/submission', submissionRoutes)
 
+// other routes
+app.use('/*', () => {
+    logger.error('This route doesn`t exist')
+})
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server listening on Port ${process.env.PORT || 3000}`)
 })
