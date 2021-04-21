@@ -1,6 +1,6 @@
-const router = require('express').Router()
 var mySqlConnection = require('../util/db')
 var mysql = mySqlConnection()
+const sendEmail = require('../util/email')
 
 const makeNotification = async (type, email) => {
   const message = `<html>
@@ -14,6 +14,19 @@ const makeNotification = async (type, email) => {
     if(err){
       return false
     }
+    let GET_USER_EMAILS = `select email from user`
+    mysql.query(GET_USER_EMAILS, async (err, emails)=>{
+      if(err){
+        return false
+      }
+      const onlyEmails = emails.map(em => em.email)
+      let res = await sendEmail(onlyEmails, `New ${type}`, message)
+      if(!res){
+        return false
+      }
+      return true
+    })
+    
     return true
   })
 }

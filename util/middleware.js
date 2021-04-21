@@ -10,7 +10,7 @@ const userAuthorize = async (req, res, next) => {
     next();
   }
   //Verifying JWT Token
-  jwt.verify(token, 'codeforces', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
       res.status(401);
     }

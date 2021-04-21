@@ -17,7 +17,7 @@ router.post('/login', async (req, res) => {
     if (bcyrpt.compareSync(req.body.password, user[0].password)) {
       var token = jwt.sign({
         id: user[0].id, email: user[0].email, name: user[0].name
-      }, 'codeforces', { expiresIn: '2d' })
+      }, process.env.JWT_SECRET, { expiresIn: '2d' })
 
       return res.status(200).json({
         message: 'Logged In',

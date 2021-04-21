@@ -2,6 +2,7 @@ const express = require('express')
 // require('dotenv').config()
 // var logger = require('morgan')
 var bodyParser = require('body-parser')
+require('dotenv').config()
 
 const app = express()
 // app.use(logger('dev'));

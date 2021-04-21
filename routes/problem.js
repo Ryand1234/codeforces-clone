@@ -4,7 +4,7 @@ const userAuthorize = require('../util/middleware')
 var mySqlConnection = require('../util/db')
 var mysql = mySqlConnection()
 const { error, success } = require('../util/interface')
-const makeNotification = require('./notification')
+const makeNotification = require('../controllers/notification')
 
 // Create Problem
 router.post('/create', userAuthorize, async (req, res) => {
