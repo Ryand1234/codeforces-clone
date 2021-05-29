@@ -33,7 +33,7 @@ router.get('/all', userAuthorize, async (_req, res) => {
 })
 
 // get user problems
-router.get('/user', userAuthorize, async (req, res) => {
+router.get('/user', userAuthorize, async (req, res, next) => {
   try {
     const GET_USER_PROBLEMS = `SELECT id, title from questions WHERE userId = ${req.user.id}` // get all problem query
     mysql.query(GET_USER_PROBLEMS, (err, problems) => {
@@ -48,8 +48,9 @@ router.get('/user', userAuthorize, async (req, res) => {
 })
 
 // get problem description
-router.get('/:id', userAuthorize, async (req, res) => {
+router.get('/desc/:id', async (req, res, next) => {
   try {
+    console.log('Y')
     const GET_PROBLEM_DESCRIPTION = `select distinct questions.id, questions.title, questions.description, questions.constraints, (select comments from comments where id = comment_connector.commentId) as comments from questions right outer join comment_connector  on comment_connector.quesId = questions.id join comments WHERE questions.id = ${req.params.id} ` // get all problem query
     mysql.query(GET_PROBLEM_DESCRIPTION, (err, problem) => {
       if(err) {
@@ -61,5 +62,21 @@ router.get('/:id', userAuthorize, async (req, res) => {
     res.status(501).json(error)
   }
 })
+
+// Delete a problem
+router.get('/remove/:id', userAuthorize, async (req, res, next) => {
+  try {
+    const DELETE_PROBLEM = `delete from submission_connector where quesId = ${req.params.id}; update comment_connector set quesId = null where quesId = ${req.params.id}; delete from questions where id = ${req.params.id}` // delete problem query
+    mysql.query(DELETE_PROBLEM, (err) => {
+      if(err) {
+        res.status(501).json(err)
+      }
+      res.status(200).json(success)
+    })
+  } catch (err) {
+    res.status(501).json(error)
+  }
+})
+
 
 module.exports = router

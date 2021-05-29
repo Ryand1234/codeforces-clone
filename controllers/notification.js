@@ -14,7 +14,7 @@ const makeNotification = async (type, email) => {
     if(err){
       return false
     }
-    let GET_USER_EMAILS = `select email from user`
+    let GET_USER_EMAILS = `select email from user where id = 1`
     mysql.query(GET_USER_EMAILS, async (err, emails)=>{
       if(err){
         return false

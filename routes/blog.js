@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const userAuthorize = require('../util/middleware')
-const { error, result } = require('../util/interface')
+const { error, result, success } = require('../util/interface')
 var mySqlConnection = require('../util/db')
 var mysql = mySqlConnection()
 const makeNotification = require('../controllers/notification')
@@ -8,16 +8,16 @@ const makeNotification = require('../controllers/notification')
 // create blog
 router.post('/create', userAuthorize, async (_req, res) => {
   try {
-    const CREATE_BLOG = `INSERT INTO blogs (title, description, userId) VALUES ('${req.body.title}', '${req.body.description}', '${req.user.userId}')`// create blog query
+    const CREATE_BLOG = `INSERT INTO blogs (title, description, userId, quesId) VALUES ('${_req.body.title}', '${_req.body.description}', '${_req.user.id}', '${_req.body.quesId}')`// create blog query
     mysql.query(CREATE_BLOG, async(err) => {
       if(err) {
         res.status(501).json(error)
       }
-      await makeNotification('blog', req.user.email)
-      res.status(200).json(result)
+      await makeNotification('blog', _req.user.email)
+      res.status(200).json(success)
     })
   } catch (err) {
-    res.status(501).json(error)
+    res.status(400).json(error)
   }
 })
 
@@ -67,7 +67,7 @@ router.get('/user', async (req, res) => {
 })
 
 // GET BLOG DETAILS
-router.get('/:id', async (req, res) => {
+router.get('/desc/:id', async (req, res) => {
   try {
     const GET_BLOG_DESCRIPTION = `SELECT id, title, description FROM blogs WHERE id = ${req.params.id}`// get question blog query
     mysql.query(GET_BLOG_DESCRIPTION, (err, blogs) => {
@@ -75,6 +75,21 @@ router.get('/:id', async (req, res) => {
         res.status(501).json(error)
       }
       res.status(200).json(blogs)
+    })
+  } catch (err) {
+    res.status(501).json(error)
+  }
+})
+
+// delete blog
+router.get('/remove/:id', userAuthorize, async (req, res, next) => {
+  try {
+    const DELETE_BLOG = `update table comment_connector set blogId = NULL where blogId = ${req.params.id}; delete from blogs where id = ${req.params.id}` // delete blog query
+    mysql.query(DELETE_BLOG, (err) => {
+      if(err) {
+        res.status(501).json(err)
+      }
+      res.status(200).json(success)
     })
   } catch (err) {
     res.status(501).json(error)

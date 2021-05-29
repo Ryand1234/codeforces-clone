@@ -1,13 +1,9 @@
 const express = require('express')
-// require('dotenv').config()
-// var logger = require('morgan')
 var bodyParser = require('body-parser')
 require('dotenv').config()
-var logger = require('./util/logger')
 var httpLogger = require('./util/httplogger')
 
 const app = express()
-// app.use(logger('dev'));
 app.use(express.static(__dirname + '/dist'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -60,9 +56,9 @@ const submissionRoutes = require('./routes/submission')
 app.use('/api/submission', submissionRoutes)
 
 // other routes
-app.use('/*', () => {
-    logger.error('This route doesn`t exist')
-})
+// app.use('/*', () => {
+//     logger.error('This route doesn`t exist')
+// })
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server listening on Port ${process.env.PORT || 3000}`)
 })
